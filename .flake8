@@ -1,0 +1,20 @@
+[flake8]
+# TODO: it would be nice at some point to reactivate some of these errors, e.g.
+# the ones checking for unused imports
+ignore =
+    # YAPF generates indentation that flake8 is not happy with. Suppress that
+    E122
+    E126,
+    E251,
+    # These two are very debatable style complains about the position of operators
+    W503,
+    W504,
+    # Line too long. YAPF does already its best to keep a reasonable line length. No
+    # need to check for it.
+    E501,
+    # module imported but unused. This would be nice to reactivate at some point
+    F401,
+    # These two complain about star imports
+    # Before activating this, all * imports should be removed
+    F403,
+    F405,

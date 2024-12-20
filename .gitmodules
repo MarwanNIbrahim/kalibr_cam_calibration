@@ -1,0 +1,9 @@
+[submodule "thirdparty/CLI11"]
+	path = thirdparty/CLI11
+	url = https://github.com/CLIUtils/CLI11.git
+[submodule "python/external/pybind11"]
+	path = python/external/pybind11
+	url = https://github.com/pybind/pybind11.git
+[submodule "python/external/pybind11_opencv_numpy"]
+	path = python/external/pybind11_opencv_numpy
+	url = https://github.com/edmBernard/pybind11_opencv_numpy.git

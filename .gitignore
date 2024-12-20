@@ -1,0 +1,84 @@
+# Ignore cmake generated build folders
+*build*
+
+# Ignore venv folders
+*venv*
+
+# Ignore local settings
+settings.local
+
+# Eclipse related folders
+**/.metadata
+
+# JetBrains related folders
+**/.idea
+
+# Visual Studio Code related folders
+**/.vscode
+compile_commands.json
+
+# Clang related files
+.clang-tidy
+.clangd/*
+.cache/clangd/*
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Python compiled files
+*.pyc
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+.directory
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# OSX files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes

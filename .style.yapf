@@ -1,0 +1,5 @@
+[style]
+based_on_style = pep8
+column_limit = 100
+# Without this yapf produces code that raises Flake E124
+align_closing_bracket_with_visual_indent = true
