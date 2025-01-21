@@ -9,7 +9,7 @@ Simple fork of [kalibr](https://github.com/ethz-asl/kalibr) for monocular camera
 - OpenCV
 - fmt
 - eigen
-- libsuitesparse-de
+- libsuitesparse-dev
 - gcc >= 10.0
 - python3-dev
 - python3-numpy
@@ -58,7 +58,7 @@ source venv/bin/activate
 
 ### 4) Install wheel requirements
 ```
-pip install wheel
+pip install wheel numpy
 ```
 
 #### 5) Build python wheel

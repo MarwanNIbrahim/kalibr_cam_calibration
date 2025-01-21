@@ -8,18 +8,17 @@ from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
+
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-
     def __init__(self, name: str, sourcedir: str = "") -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path(sourcedir).resolve())
 
 
 class CMakeBuild(build_ext):
-
     def build_extension(self, ext: CMakeExtension) -> None:
         if not os.path.exists("build"):
             os.mkdir("build")
@@ -46,6 +45,7 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
+            "-DENABLE_PYTHON=ON",
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
@@ -94,18 +94,26 @@ class CMakeBuild(build_ext):
         )
         print("Called cmake with: " + str(ret.args))
         ret = subprocess.run(
-            ["cmake", "--build", ".", "--target", "kalibr_cam_calib", *build_args],
+            [
+                "cmake",
+                "--build",
+                ".",
+                "--target",
+                "kalibr_cam_calibration",
+                *build_args,
+            ],
             cwd=build_temp,
             check=True,
         )
         print("Called cmake with: " + str(ret.args))
+
 
 setup(
     name="kalibr_cam_calibration",
     version="1.0.0",
     author="Marwan Ibrahim",
     author_email="marwan15ibrahim@gmail.com",
-    description="Test project for building Python wheels for Kalibr.",
+    description="Python wheels for custom Kalibr fork.",
     long_description="",
     ext_modules=[CMakeExtension(".")],
     cmdclass={"build_ext": CMakeBuild},
