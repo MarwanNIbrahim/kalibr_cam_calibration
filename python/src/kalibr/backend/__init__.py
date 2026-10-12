@@ -6,9 +6,17 @@ CalibrationFlags = backend.CalibrationFlags
 CalibrationResult = backend.CalibrationResult
 KalibrCalibrator = backend.KalibrCalibrator
 OCVCalibrator = backend.OCVCalibrator
+ImuParameters = backend.ImuParameters
+ImuCameraOptions = backend.ImuCameraOptions
+ImuCameraResult = backend.ImuCameraResult
+ImuCameraCalibrator = backend.ImuCameraCalibrator
 
 __all__ = ["DistortionModel",
            "CalibrationFlags",
            "CalibrationResult",
            "KalibrCalibrator",
-           "OCVCalibrator"]
+           "OCVCalibrator",
+           "ImuParameters",
+           "ImuCameraOptions",
+           "ImuCameraResult",
+           "ImuCameraCalibrator"]

@@ -21,11 +21,11 @@
 namespace kalibr::frontend {
 
 /**
- * Hold image and corresponding timestamp.
+ * Hold image and corresponding timestamp in microseconds.
  */
 struct StampedImage {
     cv::Mat image;
-    int64_t timestamp;
+    int64_t timestamp;  // microseconds
 
     StampedImage(){};
 
@@ -131,7 +131,8 @@ class MarkerDetector {
         }
 
         aslam::cameras::GridCalibrationTargetObservation observation;
-        detector->findTarget(stampedImage.image, aslam::Time(stampedImage.timestamp), observation);
+        const aslam::Time stamp(static_cast<double>(stampedImage.timestamp) * 1e-6);
+        detector->findTarget(stampedImage.image, stamp, observation);
         observation.setImage(stampedImage.image);
 
         return observation;

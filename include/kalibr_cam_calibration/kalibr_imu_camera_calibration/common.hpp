@@ -18,17 +18,17 @@ static constexpr size_t HELPER_GROUP_ID         = 1;
 static constexpr size_t TRANSFORMATION_GROUP_ID = 2;
 static constexpr size_t LANDMARK_GROUP_ID       = 3;
 
-void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
+inline void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
                               boost::shared_ptr<aslam::splines::BSplinePoseDesignVariable> dvc,
                               bool setActive = true,
                               size_t groupId = HELPER_GROUP_ID);
 
-void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
+inline void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
                               boost::shared_ptr<aslam::splines::EuclideanBSplineDesignVariable> dvc,
                               bool setActive = true,
                               size_t groupId = HELPER_GROUP_ID);
 
-std::tuple<double, double, double> errorStatistics(std::vector<double> vals);
+inline std::tuple<double, double, double> errorStatistics(std::vector<double> vals);
 
 /**
  * Dummy dealocation function used to avoid double destruction of shared pointer.
@@ -39,7 +39,7 @@ template <class T>
 static void Deallocate(T* object) {
 }
 
-void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
+inline void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
                               boost::shared_ptr<aslam::splines::BSplinePoseDesignVariable> dvc,
                               bool setActive,
                               size_t groupId) {
@@ -52,7 +52,7 @@ void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::Optimization
     }
 }
 
-void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
+inline void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::OptimizationProblem> problem,
                               boost::shared_ptr<aslam::splines::EuclideanBSplineDesignVariable> dvc,
                               bool setActive,
                               size_t groupId) {
@@ -67,7 +67,7 @@ void addSplineDesignVariables(boost::shared_ptr<aslam::calibration::Optimization
 
 #include <numeric>
 
-std::tuple<double, double, double> errorStatistics(std::vector<double> vals) {
+inline std::tuple<double, double, double> errorStatistics(std::vector<double> vals) {
     std::tuple<double, double, double> result = std::make_tuple(-1.0, -1.0, -1.0);
     if (vals.size() < 2) {
         return result;

@@ -53,7 +53,7 @@ struct CalibrationResult {
     }
 };
 
-void printResult(const CalibrationResult& result, std::ostream& ss) {
+inline void printResult(const CalibrationResult& result, std::ostream& ss) {
     ss << "Optimization converged:" << std::endl;
     ss << "  " << (result.converged ? "true" : "false") << std::endl;
     ss << "Transformation T_cam_imu:" << std::endl;
@@ -134,8 +134,8 @@ class IccCalibrator {
                       double mrRotationVariance    = 1e5,
                       bool doBiasMotionError       = true,
                       int blakeZisserCam           = -1,
-                      int huberAccel               = -1,
-                      int huberGyro                = -1,
+                      double huberAccel            = -1,
+                      double huberGyro             = -1,
                       bool noTimeCalibration       = false,
                       bool noChainExtrinsics       = true,
                       int maxIterations            = 20,
@@ -143,12 +143,6 @@ class IccCalibrator {
                       double accelNoiseScale       = 1.0,
                       double timeOffsetPadding     = 0.02,
                       bool verbose                 = false) {
-        problemBuilt = true;
-
-        if (!problemBuilt) {
-            throw std::runtime_error("Problem was not built before calibrate() was called");
-        }
-
         auto bool2string = [](bool val) { return (val ? "true" : "false"); };
 
         std::cout << "\tSpline order: " << splineOrder << std::endl;
@@ -209,7 +203,7 @@ class IccCalibrator {
                                            poseDv,
                                            gravityExpression->toValue(),
                                            huberAccel,
-                                           accelNoiseScale = accelNoiseScale);
+                                           accelNoiseScale);
         iccImu->addGyroscopeErrorTerms(
             problem, poseDv, gravityExpression->toValue(), huberGyro, gyroNoiseScale);
 
@@ -217,13 +211,20 @@ class IccCalibrator {
         if (doBiasMotionError) {
             iccImu->addBiasMotionTerms(problem);
         }
+
+        problemBuilt = true;
     }
 
     void optimize(boost::shared_ptr<aslam::backend::Optimizer2Options> options = nullptr,
-                  const size_t maxIterations                                   = 30) {
+                  const size_t maxIterations                                   = 30,
+                  const bool verbose                                           = true) {
+        if (!problemBuilt) {
+            throw std::runtime_error("Problem was not built before optimize() was called");
+        }
+
         if (options == nullptr) {
             options          = boost::make_shared<aslam::backend::Optimizer2Options>();
-            options->verbose = true;
+            options->verbose = verbose;
             const double levenbergMarquardtLambdaInit = 10.0;
             options->nThreads          = std::max(1u, std::thread::hardware_concurrency() - 1);
             options->convergenceDeltaX = 1e-5;

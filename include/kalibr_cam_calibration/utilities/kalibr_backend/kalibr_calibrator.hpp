@@ -14,7 +14,7 @@ class KalibrCalibrator : public CalibratorBase {
             std::map<int64_t, aslam::cameras::GridCalibrationTargetObservation>>();
         boost::shared_ptr<aslam::cameras::GridCalibrationTargetBase> grid = nullptr;
         for (auto& obs : observations) {
-            observationsMap->emplace(obs.time().toSec(), obs);
+            observationsMap->emplace(toMicroseconds(obs.time()), obs);
             if (grid == nullptr) {
                 grid = obs.target();
             }

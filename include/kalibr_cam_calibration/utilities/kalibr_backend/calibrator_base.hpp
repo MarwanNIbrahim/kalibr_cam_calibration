@@ -3,6 +3,11 @@
 #include "utilities/kalibr_backend/calibration_result.hpp"
 
 namespace kalibr::backend {
+// Observation key: aslam::Time holds seconds, the public API uses microseconds
+inline int64_t toMicroseconds(const aslam::Time& time) {
+    return std::llround(time.toSec() * 1e6);
+}
+
 enum CalibrationFlags{
     NONE = 0,
     FIX_DISTORTION = 1,

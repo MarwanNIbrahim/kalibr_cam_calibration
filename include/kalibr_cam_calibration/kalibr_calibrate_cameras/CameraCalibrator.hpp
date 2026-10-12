@@ -14,7 +14,7 @@
 
 #include <ostream>
 
-boost::shared_ptr<aslam::backend::TransformationBasic> addPoseDesignVariable(
+inline boost::shared_ptr<aslam::backend::TransformationBasic> addPoseDesignVariable(
     boost::shared_ptr<aslam::backend::OptimizationProblem>& problem,
     const sm::kinematics::Transformation& T0) {
     auto q_Dv = boost::make_shared<aslam::backend::RotationQuaternion>(T0.q());
@@ -29,7 +29,7 @@ boost::shared_ptr<aslam::backend::TransformationBasic> addPoseDesignVariable(
                                                                    t_Dv->toExpression());
 }
 
-std::tuple<double, double> meanStd(std::vector<double> vals) {
+inline std::tuple<double, double> meanStd(std::vector<double> vals) {
     double sum = 0.0;
     for (const auto& val : vals) {
         sum += val;
@@ -46,7 +46,7 @@ std::tuple<double, double> meanStd(std::vector<double> vals) {
     return std::make_tuple(mean, std);
 }
 
-std::tuple<Eigen::Vector2d, Eigen::Vector2d> getReprojectionErrorStatistics(
+inline std::tuple<Eigen::Vector2d, Eigen::Vector2d> getReprojectionErrorStatistics(
     const std::vector<std::vector<Eigen::MatrixXd>>& all_rerrs) {
     std::vector<double> xVals, yVals;
     for (const auto& view_rerrs : all_rerrs) {

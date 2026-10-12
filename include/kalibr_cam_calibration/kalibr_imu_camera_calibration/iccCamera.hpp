@@ -72,6 +72,9 @@ class IccCamera {
     typedef boost::shared_ptr<ReprojectionError> ReprojectionErrorSP;
     std::vector<std::vector<ReprojectionErrorSP>> allReprojectionErrors;
 
+    // Reprojection errors keep raw pointers to their frame, so the frames must outlive them
+    std::vector<boost::shared_ptr<aslam::Frame<CameraGeometryType>>> frames;
+
   public:
     IccCamera(const std::vector<double>& intrinsics,
               const std::vector<double>& distCoeffs,
@@ -82,9 +85,9 @@ class IccCamera {
               const bool showCorners         = true,
               const bool showReproj          = true,
               const bool showOneStep         = false)
-        : camera(intrinsics, distCoeffs, _imageSize),
-          imageSize(imageSize),
-          cornerUncertainty(reprojectionSigma) {
+        : cornerUncertainty(reprojectionSigma),
+          camera(intrinsics, distCoeffs, _imageSize),
+          imageSize(_imageSize) {
         targetObservations = observations;
         gravity_w          = Eigen::Vector3d(9.80655, 0., 0.);
         T_extrinsic        = sm::kinematics::Transformation();
@@ -105,8 +108,9 @@ class IccCamera {
                                               T_c_b_Dv_t->toEuclidean());
     }
 
+    // Total shift (t_imu = t_cam + shift): optimized part plus the prior applied outside
     double getResultTimeShift() {
-        return cameraTimeToImuTimeDv->toScalar();
+        return cameraTimeToImuTimeDv->toScalar() + timeshiftCamToImuPrior;
     }
 
     void findOrientationPriorCameraToImu(boost::shared_ptr<IccImu> iccImu) {
@@ -429,6 +433,7 @@ class IccCamera {
             // #setup an aslam frame (handles the distortion)
             auto frame = camera.frame();
             frame->setGeometry(camera.getGeometry());
+            frames.push_back(frame);
 
             // #corner uncertainty
             const auto cornerUncVal = cornerUncertainty * cornerUncertainty;

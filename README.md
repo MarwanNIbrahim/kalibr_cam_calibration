@@ -73,3 +73,16 @@ Installing the python wheel allows you to use kalibr as follows
 import kalibr
 ```
 See [sample](python/samples/sample_run_detector.py) for how to use the Kalibr frontend/backend for camera calibration.
+
+### Camera <-> IMU calibration (Python)
+`kalibr.backend.ImuCameraCalibrator` estimates the camera-IMU transformation `T_cam_imu` and their time offset.
+Intrinsics come from a prior monocular calibration and stay fixed. Add the target observations from
+`MarkerDetector.detectPattern` and the IMU samples as an `(N, 7)` array `[t_us, gx, gy, gz, ax, ay, az]`.
+All timestamps are in microseconds and must come from the same clock.
+```
+calib = kalibr.backend.ImuCameraCalibrator(camera_result, kalibr.backend.ImuParameters())
+for obs in observations:
+    calib.addObservation(obs)
+calib.addImuMeasurements(imu_data)
+result = calib.calibrate()  # result.T_cam_imu (4x4), result.timeShift [s]: t_imu = t_cam + timeShift
+```

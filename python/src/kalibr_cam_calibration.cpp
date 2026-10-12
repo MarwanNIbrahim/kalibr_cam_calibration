@@ -1,4 +1,5 @@
 #include "../external/pybind11_opencv_numpy/ndarray_converter.h"
+#include "utilities/kalibr_backend/imu_camera_calibrator.hpp"
 #include "utilities/kalibr_backend/kalibr_calibrator.hpp"
 #include "utilities/kalibr_backend/ocv_calibrator.hpp"
 #include "utilities/kalibr_frontend/marker_detector.hpp"
@@ -152,10 +153,15 @@ PYBIND11_MODULE(kalibr_cam_calibration, m) {
 
     py::class_<kalibr::frontend::StampedImage>(m_frontend, "StampedImage")
         .def(py::init<>(), "Default constructor for StampedImage struct")
+        .def(py::init<cv::Mat, const int64_t>(),
+             "image"_a,
+             "timestamp"_a,
+             "Construct from an image and its capture time in microseconds")
         .def_readwrite("image", &kalibr::frontend::StampedImage::image, "Image contents")
         .def_readwrite("timestamp",
                        &kalibr::frontend::StampedImage::timestamp,
-                       "Capture time of the image, usually refers to start of exposure")
+                       "Capture time of the image in microseconds, usually refers to start of "
+                       "exposure")
         .def("clone", &kalibr::frontend::StampedImage::clone, "Clone the current image");
 
     py::class_<aslam::cameras::GridCalibrationTargetObservation>(m_frontend,
@@ -281,4 +287,95 @@ PYBIND11_MODULE(kalibr_cam_calibration, m) {
         .def("calibrateCamera",
              &kalibr::backend::OCVCalibrator::calibrateCamera,
              "Run camera calibration based on the added observations.");
+
+    py::class_<kalibr::backend::ImuParameters>(m_backend, "ImuParameters")
+        .def(py::init<>(), "IMU noise model with Kalibr default values (continuous time)")
+        .def_readwrite("updateRate", &kalibr::backend::ImuParameters::updateRate, "Rate [Hz]")
+        .def_readwrite("accNoiseDensity",
+                       &kalibr::backend::ImuParameters::accNoiseDensity,
+                       "Accelerometer noise density [m/s^2/sqrt(Hz)]")
+        .def_readwrite("accRandomWalk",
+                       &kalibr::backend::ImuParameters::accRandomWalk,
+                       "Accelerometer bias random walk [m/s^3/sqrt(Hz)]")
+        .def_readwrite("gyrNoiseDensity",
+                       &kalibr::backend::ImuParameters::gyrNoiseDensity,
+                       "Gyroscope noise density [rad/s/sqrt(Hz)]")
+        .def_readwrite("gyrRandomWalk",
+                       &kalibr::backend::ImuParameters::gyrRandomWalk,
+                       "Gyroscope bias random walk [rad/s^2/sqrt(Hz)]");
+
+    py::class_<kalibr::backend::ImuCameraOptions>(m_backend, "ImuCameraOptions")
+        .def(py::init<>(), "Default IMU-camera calibration options")
+        .def_readwrite("splineOrder", &kalibr::backend::ImuCameraOptions::splineOrder)
+        .def_readwrite("poseKnotsPerSecond",
+                       &kalibr::backend::ImuCameraOptions::poseKnotsPerSecond)
+        .def_readwrite("biasKnotsPerSecond",
+                       &kalibr::backend::ImuCameraOptions::biasKnotsPerSecond)
+        .def_readwrite("estimateTimeShift",
+                       &kalibr::backend::ImuCameraOptions::estimateTimeShift)
+        .def_readwrite("maxIterations", &kalibr::backend::ImuCameraOptions::maxIterations)
+        .def_readwrite("timeOffsetPadding",
+                       &kalibr::backend::ImuCameraOptions::timeOffsetPadding,
+                       "Spline padding [s]")
+        .def_readwrite("huberAccel",
+                       &kalibr::backend::ImuCameraOptions::huberAccel,
+                       "Accelerometer Huber width (sigma), <= 0 disables")
+        .def_readwrite("huberGyro",
+                       &kalibr::backend::ImuCameraOptions::huberGyro,
+                       "Gyroscope Huber width (sigma), <= 0 disables")
+        .def_readwrite("verbose", &kalibr::backend::ImuCameraOptions::verbose);
+
+    py::class_<kalibr::backend::ImuCameraResult>(m_backend, "ImuCameraResult")
+        .def(py::init<>())
+        .def_readwrite("T_cam_imu",
+                       &kalibr::backend::ImuCameraResult::T_cam_imu,
+                       "4x4 transformation from IMU frame to camera frame")
+        .def_readwrite("timeShift",
+                       &kalibr::backend::ImuCameraResult::timeShift,
+                       "Time shift [s]: t_imu = t_cam + timeShift")
+        .def_readwrite("converged", &kalibr::backend::ImuCameraResult::converged)
+        .def_readwrite("reprojectionError",
+                       &kalibr::backend::ImuCameraResult::reprojectionError,
+                       "Mean reprojection error [px]")
+        .def_readwrite("gyroscopeError",
+                       &kalibr::backend::ImuCameraResult::gyroscopeError,
+                       "Mean gyroscope error [rad/s]")
+        .def_readwrite("accelerometerError",
+                       &kalibr::backend::ImuCameraResult::accelerometerError,
+                       "Mean accelerometer error [m/s^2]")
+        .def("writeToFile",
+             &kalibr::backend::ImuCameraResult::writeToFile,
+             "filePath"_a,
+             "Save the result as JSON.");
+
+    py::class_<kalibr::backend::ImuCameraCalibrator>(m_backend, "ImuCameraCalibrator")
+        .def(py::init<const kalibr::backend::CalibrationResult&,
+                      const kalibr::backend::ImuParameters&,
+                      const kalibr::backend::ImuCameraOptions&>(),
+             "camera"_a,
+             "imu"_a,
+             "options"_a = kalibr::backend::ImuCameraOptions(),
+             "Initialize IMU-camera calibrator from a monocular calibration result. Intrinsics "
+             "stay fixed.")
+        .def("addObservation",
+             &kalibr::backend::ImuCameraCalibrator::addObservation,
+             "observation"_a,
+             "Add a target observation; unsuccessful detections are ignored")
+        .def("addImuMeasurement",
+             &kalibr::backend::ImuCameraCalibrator::addImuMeasurement,
+             "timestamp"_a,
+             "gyro"_a,
+             "acc"_a,
+             "Add one IMU sample: timestamp [us], gyro (3,) [rad/s], acc (3,) [m/s^2]")
+        .def("addImuMeasurements",
+             &kalibr::backend::ImuCameraCalibrator::addImuMeasurements,
+             "data"_a,
+             "Add IMU samples as an (N, 7) array: [t_us, gx, gy, gz, ax, ay, az]")
+        .def("getNumValidObservations",
+             &kalibr::backend::ImuCameraCalibrator::getNumValidObservations)
+        .def("getNumImuMeasurements", &kalibr::backend::ImuCameraCalibrator::getNumImuMeasurements)
+        .def("calibrate",
+             &kalibr::backend::ImuCameraCalibrator::calibrate,
+             py::call_guard<py::gil_scoped_release>(),
+             "Run the IMU-camera calibration. Raises RuntimeError on failure.");
 }
