@@ -75,7 +75,11 @@ namespace {
   template<>
   struct IntType< long >
   {
+#ifdef CHOLMOD_INTLONG
       static const int intType = CHOLMOD_INTLONG;
+#else
+    static const int intType = CHOLMOD_LONG;
+#endif
   };
   template<>
   struct IntType< int >

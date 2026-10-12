@@ -38,7 +38,10 @@
 
 #include "aslam/calibration/core/LinearSolverOptions.h"
 
-template <typename Entry> struct SuiteSparseQR_factorization;
+#include <cstdint>
+
+// SuiteSparse >= 7: factorization is templated on <Entry, Int>; Int = int64_t matches cholmod_l_*
+template <typename Entry, typename Int> struct SuiteSparseQR_factorization;
 
 namespace sm {
 
@@ -224,7 +227,7 @@ namespace aslam {
       /// Cholmod common structure
       cholmod_common _cholmod;
       /// Caching current factorization if needed
-      SuiteSparseQR_factorization<double>* _factor;
+      SuiteSparseQR_factorization<double, int64_t>* _factor;
       /// Caching current estimated numerical rank for SVD
       std::ptrdiff_t _svdRank;
       /// Caching current gap in estimated singular values at the rank

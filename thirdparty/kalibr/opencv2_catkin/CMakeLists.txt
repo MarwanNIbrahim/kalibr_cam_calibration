@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.15)
 project(opencv2_catkin)
 
 find_package(catkin_simple REQUIRED)

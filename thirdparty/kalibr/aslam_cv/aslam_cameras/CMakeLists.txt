@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.15)
 project(aslam_cameras)
 
 find_package(Eigen3 REQUIRED)
@@ -10,8 +10,6 @@ ADD_DEFINITIONS(-DASLAM_USE_ROS )
 
 add_definitions(-fPIC)
 
-
-set(BOOST_ROOT "${CMAKE_SYSROOT}/opt/boost")
 
 find_package(Boost 1.79 REQUIRED COMPONENTS system serialization filesystem)
 
@@ -54,4 +52,3 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC
         include)
 
-INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${DV_MODULES_DIR}/imu-calibration)

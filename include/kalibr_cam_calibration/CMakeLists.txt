@@ -1,11 +1,11 @@
-find_package(Eigen3 REQUIRED)
-find_package(fmt REQUIRED)
-find_package(OpenCV REQUIRED)
+FIND_PACKAGE(Eigen3 REQUIRED)
+FIND_PACKAGE(fmt REQUIRED)
+FIND_PACKAGE(OpenCV REQUIRED)
 
-add_library(cam_calibration INTERFACE)
-add_library(kalibr::cam_calibration ALIAS cam_calibration)
+ADD_LIBRARY(cam_calibration INTERFACE)
+ADD_LIBRARY(kalibr::cam_calibration ALIAS cam_calibration)
 
-target_link_libraries(
+TARGET_LINK_LIBRARIES(
   cam_calibration
   INTERFACE ${SYSTEM_THREAD_LIBS}
             Eigen3::Eigen
@@ -21,6 +21,7 @@ target_link_libraries(
             sm_kinematics
             aslam_cv_error_terms
             sm_boost)
-target_include_directories(
+
+TARGET_INCLUDE_DIRECTORIES(
   cam_calibration
   INTERFACE ${PROJECT_SOURCE_DIR}/include/kalibr_cam_calibration)

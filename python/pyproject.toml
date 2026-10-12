@@ -1,0 +1,23 @@
+[build-system]
+requires = [
+    "scikit-build-core",
+    "numpy>=1.25",
+    "cmake>=3.15"
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "kalibr"
+version = "0.1.0"
+description = "Kalibr python bindings"
+requires-python = ">=3.8"
+dependencies = ["numpy"]
+
+[tool.scikit-build]
+cmake.source-dir = ".."
+build-dir = "../build/{wheel_tag}"
+build.verbose = true
+cmake.args = [
+    "-DENABLE_PYTHON=ON"
+]
+

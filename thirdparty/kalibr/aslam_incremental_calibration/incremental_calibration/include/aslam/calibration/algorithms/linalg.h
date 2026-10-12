@@ -35,7 +35,10 @@ struct cholmod_dense_struct;
 typedef cholmod_dense_struct cholmod_dense;
 struct cholmod_common_struct;
 typedef cholmod_common_struct cholmod_common;
-template <typename Entry> struct SuiteSparseQR_factorization;
+#include <cstdint>
+
+// SuiteSparse >= 7: factorization is templated on <Entry, Int>; Int = int64_t matches cholmod_l_*
+template <typename Entry, typename Int> struct SuiteSparseQR_factorization;
 
 namespace aslam {
   namespace calibration {
@@ -197,7 +200,7 @@ namespace aslam {
      * \param[out] Omega reduced matrix
      * \param[out] A_rtQ A_r' * Q, used subsequently by reduceRightHandSide
      */
-     void reduceLeftHandSide(SuiteSparseQR_factorization<double>* factor,
+     void reduceLeftHandSide(SuiteSparseQR_factorization<double, int64_t>* factor,
       cholmod_sparse* A_rt, cholmod_sparse** Omega, cholmod_sparse** A_rtQ,
       cholmod_common* cholmod);
     /** 
@@ -212,7 +215,7 @@ namespace aslam {
      * \param[in] A_rtQ A_r' * Q, comes from reduceLeftHandSide
      * \param[in] cholmod cholmod workspace
      */
-    cholmod_dense* reduceRightHandSide(SuiteSparseQR_factorization<double>*
+    cholmod_dense* reduceRightHandSide(SuiteSparseQR_factorization<double, int64_t>*
       factor, cholmod_sparse* A_rt, cholmod_sparse* A_rtQ, cholmod_dense* b,
       cholmod_common* cholmod);
     /** 
@@ -256,7 +259,7 @@ namespace aslam {
      * \param[in] x_r LS solution for the right side of the original matrix
      * \param[in] cholmod cholmod workspace
      */
-    cholmod_dense* solveQR(SuiteSparseQR_factorization<double>* factor,
+    cholmod_dense* solveQR(SuiteSparseQR_factorization<double, int64_t>* factor,
       cholmod_dense* b, cholmod_sparse* A_r, const Eigen::VectorXd& x_r,
       cholmod_common* cholmod);
     /** @}

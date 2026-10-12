@@ -1,8 +1,8 @@
 # Ignore cmake generated build folders
-*build*
+build*/
 
 # Ignore venv folders
-*venv*
+*venv*/
 
 # Ignore local settings
 settings.local
@@ -51,8 +51,12 @@ compile_commands.json
 *.out
 *.app
 
-# Python compiled files
+# Python compiled files and packaging artifacts
 *.pyc
+__pycache__/
+*.egg-info/
+dist/
+*.whl
 
 # Windows image file caches
 Thumbs.db

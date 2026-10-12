@@ -11,70 +11,56 @@ Simple fork of [kalibr](https://github.com/ethz-asl/kalibr) for monocular camera
 - eigen
 - libsuitesparse-dev
 - gcc >= 10.0
-- python3-dev
-- python3-numpy
+- python3-dev (numpy is installed by pip/uv, both for the build and at runtime)
 
 ## Build instructions
 
-### C++
-#### 1) Clone the repo
+### Common steps
 ```
 git clone <path_to_repo>
 cd kalibr_cam_calibration
-```
-
-#### 2) Update submodules
-```
 git submodule update --init --recursive
 ```
 
-#### 3) Start build
+### C++
 ```
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j4 -s
+cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release -DENABLE_SAMPLES=ON
+cmake --build build/release -j$(nproc)
 ```
+`ENABLE_SAMPLES=ON` also builds `build/release/samples/sample_run_detector`.
 
+Optionally install the kalibr shared libraries (into `<prefix>/lib`, with `$ORIGIN` RPATH):
+```
+cmake --install build/release --prefix /path/to/prefix
+```
 
 ### Python bindings
+The package is built with [scikit-build-core](https://scikit-build-core.readthedocs.io) from
+[python/pyproject.toml](python/pyproject.toml), which configures the top-level CMake project with `-DENABLE_PYTHON=ON`.
+Build requirements (cmake, numpy, scikit-build-core) and the numpy runtime dependency are fetched automatically.
 
-#### 1) Clone the repo
+Install into a [uv](https://docs.astral.sh/uv/) virtual environment:
 ```
-git clone <path_to_repo>
-cd kalibr_cam_calibration
-```
-
-#### 2) Update submodules
-```
-git submodule update --init --recursive
-```
-
-#### 3) Create virtual environment
-```
-python3 -m venv venv
-source venv/bin/activate
+uv venv
+source .venv/bin/activate
+uv pip install -v ./python
 ```
 
-### 4) Install wheel requirements
+Or build a wheel, e.g. to install on another machine:
 ```
-pip install wheel numpy
-```
-
-#### 5) Build python wheel
-```
-python3 setup.py bdist_wheel
+uv build ./python --wheel -o dist
+uv pip install dist/kalibr-0.1.0-cp*-linux_x86_64.whl
 ```
 
-#### 6) Install resulting wheel via your favourite package manager
-
-The resulting wheel should be found under build/dist/kalibr_cam_calibration-1.0.0-cpxxx-cpxxx-linux_x86_64.whl
-
-To install the wheel using pip, for example, run:
+Check the installation from outside the repository:
 ```
-pip install --force-reinstall path/to/build/dist/kalibr_cam_calibration-1.0.0-cpxxx-cpxxx-linux_x86_64.whl
+cd /tmp && python -c "import kalibr"
 ```
 
+Without uv, the same works with pip inside a regular venv: `pip install -v ./python`.
+
+The wheel bundles the kalibr shared libraries (`libaslam_*.so`, `libsm_*.so`, ...) inside the `kalibr` package.
+System libraries (OpenCV, Boost, SuiteSparse, fmt) are not bundled and must be installed on the target machine.
 
 ## Usage
 
@@ -84,6 +70,6 @@ Use the given [sample](samples/sample_run_detector.cpp) for running monocular ca
 ### Python
 Installing the python wheel allows you to use kalibr as follows
 ```
-import kalibr_cam_calibration as kalibr
+import kalibr
 ```
-See [sample](python/samples/sample_run_detector.cpp) for how to use the Kalibr frontend/backend for camera calibration.
+See [sample](python/samples/sample_run_detector.py) for how to use the Kalibr frontend/backend for camera calibration.

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.15)
 project(incremental_calibration_python)
 
 find_package(catkin_simple REQUIRED)

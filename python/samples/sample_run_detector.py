@@ -1,4 +1,4 @@
-import kalibr_cam_calibration as kalibr
+import kalibr
 import argparse
 from dataclasses import dataclass
 import os
@@ -85,7 +85,7 @@ def main():
     resolution = None
     numTotalImages = 0
     for f in os.listdir(args.pathToImages):
-        if not f.endswith(".png"):
+        if not f.endswith(".jpeg") and not f.endswith(".png"):
             continue
 
         imagePath = os.path.join(args.pathToImages, f)
@@ -101,6 +101,8 @@ def main():
 
     for i in range(numTotalImages):
         imagePath = os.path.join(args.pathToImages, f"Image_{i}.png")
+        if not os.path.exists(imagePath):
+            imagePath = os.path.join(args.pathToImages, f"Image_{i}.jpeg")
         I = cv2.imread(imagePath)
         if (I.shape[0] == 0):
             continue
