@@ -79,11 +79,14 @@ class ImuCameraCalibrator {
     void addImuMeasurement(const int64_t timestampUs,
                            const Eigen::Vector3d& gyro,
                            const Eigen::Vector3d& acc) {
+        // Measurement covariances from the discrete-time noise, as Kalibr's IccImu.loadImuData
+        const double gyroSigma  = std::get<0>(imuParameters.getGyroStatistics());
+        const double accelSigma = std::get<0>(imuParameters.getAccelerometerStatistics());
         imuData.emplace_back(static_cast<double>(timestampUs) * 1e-6,
                              gyro,
                              acc,
-                             Eigen::Matrix3d::Identity(),
-                             Eigen::Matrix3d::Identity());
+                             Eigen::Matrix3d::Identity() * gyroSigma * gyroSigma,
+                             Eigen::Matrix3d::Identity() * accelSigma * accelSigma);
     }
 
     /**
